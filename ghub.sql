@@ -2,7 +2,6 @@
 SELECT * FROM `arboreal-vision-339901.take_home_v2.virtual_kitchen_grubhub_hours` LIMIT 5;
 
 -- understanding UNNEST
-
 CREATE TEMP FUNCTION jsonObjectKeys(input STRING)
 RETURNS Array<String>
 LANGUAGE js AS """
@@ -55,3 +54,28 @@ SELECT
   ExtractHours(response) AS hours 
 FROM `arboreal-vision-339901.take_home_v2.virtual_kitchen_grubhub_hours`;
 
+
+-- nested JSON extract
+SELECT 
+  vb_name,
+  JSON_EXTRACT(response, '$.availability_by_catalog.STANDARD_DELIVERY.schedule_rules') as sch
+FROM 
+  `arboreal-vision-339901.take_home_v2.virtual_kitchen_grubhub_hours` LIMIT 5;
+
+
+-- Prefinal Query to extract JSON data.
+
+WITH schedule_rules AS (
+
+  SELECT 
+    vb_name,
+    JSON_EXTRACT_SCALAR(value, '$.days_of_week[0]') AS day,
+    JSON_EXTRACT_SCALAR(value, '$.from') AS open_time,    
+    JSON_EXTRACT_SCALAR(value, '$.to') AS close_time  
+  FROM `arboreal-vision-339901.take_home_v2.virtual_kitchen_grubhub_hours`,
+   UNNEST(JSON_QUERY_ARRAY(response, 
+     '$.availability_by_catalog.STANDARD_DELIVERY.schedule_rules')) AS value
+)
+
+SELECT * 
+FROM schedule_rules
