@@ -69,7 +69,6 @@ WITH schedule_rules AS (
 
   SELECT 
     vb_name,
-    JSON_EXTRACT_SCALAR(value, '$.days_of_week[0]') AS day,
     JSON_EXTRACT_SCALAR(value, '$.from') AS open_time,    
     JSON_EXTRACT_SCALAR(value, '$.to') AS close_time  
   FROM `arboreal-vision-339901.take_home_v2.virtual_kitchen_grubhub_hours`,
